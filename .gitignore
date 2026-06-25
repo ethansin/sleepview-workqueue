@@ -216,3 +216,16 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Frontend
+frontend/node_modules/
+frontend/build/
+frontend/.env
+frontend/.env.local
+
+# GCP credentials — never commit
+*-credentials.json
+service-account*.json
+
+# macOS
+.DS_Store
