@@ -12,6 +12,8 @@ class Settings(BaseSettings):
     session_secret: str
     # CORS origin for the frontend
     frontend_origin: str = "http://localhost:3000"
+    # Set to False for local HTTP development; True in production (HTTPS required)
+    cookie_secure: bool = False
     # PDF retention days before archival deletion (HIPAA: 6 years minimum)
     retention_days: int = 2190  # 6 years
 

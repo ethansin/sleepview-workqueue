@@ -95,10 +95,11 @@ def list_items_by_status(status: ItemStatus) -> list[WorkflowItem]:
     docs = (
         db.collection(ITEMS_COLLECTION)
         .where("status", "==", status.value)
-        .order_by("created_at")
         .stream()
     )
-    return [_deserialize(d) for d in docs]
+    items = [_deserialize(d) for d in docs]
+    items.sort(key=lambda x: x.created_at or datetime.min)
+    return items
 
 
 def update_item(item: WorkflowItem, actor: str, action: str) -> WorkflowItem:
@@ -111,3 +112,90 @@ def update_item(item: WorkflowItem, actor: str, action: str) -> WorkflowItem:
 
 def list_archived() -> list[WorkflowItem]:
     return list_items_by_status(ItemStatus.archived)
+
+
+PENDING_USERS_COLLECTION = "pending_users"
+FAILED_LOGIN_LIMIT = 10
+LOCKOUT_MINUTES = 15
+
+
+def create_pending_user(email: str, name: str, hashed_password: str) -> None:
+    db = get_client()
+    db.collection(PENDING_USERS_COLLECTION).document(email).set(
+        {
+            "email": email,
+            "name": name,
+            "hashed_password": hashed_password,
+            "requested_at": datetime.now(timezone.utc),
+            "status": "pending",
+        }
+    )
+
+
+def get_pending_user(email: str) -> Optional[dict]:
+    db = get_client()
+    doc = db.collection(PENDING_USERS_COLLECTION).document(email).get()
+    if not doc.exists:
+        return None
+    return doc.to_dict()
+
+
+def list_pending_users() -> list[dict]:
+    db = get_client()
+    docs = (
+        db.collection(PENDING_USERS_COLLECTION)
+        .where("status", "==", "pending")
+        .stream()
+    )
+    results = []
+    for doc in docs:
+        d = doc.to_dict()
+        d.pop("hashed_password", None)
+        results.append(d)
+    results.sort(key=lambda x: x.get("requested_at") or datetime.min.replace(tzinfo=timezone.utc))
+    return results
+
+
+def approve_pending_user(email: str, role: str, actor: str) -> None:
+    db = get_client()
+    pending_doc = db.collection(PENDING_USERS_COLLECTION).document(email).get()
+    if not pending_doc.exists:
+        return
+    data = pending_doc.to_dict()
+    db.collection("users").document(email).set(
+        {
+            "role": role,
+            "name": data.get("name", email),
+            "hashed_password": data.get("hashed_password"),
+            "failed_logins": 0,
+        }
+    )
+    db.collection(PENDING_USERS_COLLECTION).document(email).delete()
+    audit(actor, "approve_user", "", f"approved:{email} role:{role}")
+
+
+def reject_pending_user(email: str, actor: str) -> None:
+    db = get_client()
+    db.collection(PENDING_USERS_COLLECTION).document(email).update({"status": "rejected"})
+    audit(actor, "reject_user", "", f"rejected:{email}")
+
+
+def increment_failed_login(email: str) -> None:
+    from datetime import timedelta
+    db = get_client()
+    ref = db.collection("users").document(email)
+    doc = ref.get()
+    if not doc.exists:
+        return
+    data = doc.to_dict()
+    count = (data.get("failed_logins") or 0) + 1
+    update: dict = {"failed_logins": count}
+    if count >= FAILED_LOGIN_LIMIT:
+        update["locked_until"] = datetime.now(timezone.utc) + timedelta(minutes=LOCKOUT_MINUTES)
+        update["failed_logins"] = 0
+    ref.update(update)
+
+
+def reset_failed_login(email: str) -> None:
+    db = get_client()
+    db.collection("users").document(email).update({"failed_logins": 0, "locked_until": None})

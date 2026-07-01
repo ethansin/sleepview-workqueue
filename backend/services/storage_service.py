@@ -3,6 +3,8 @@ from __future__ import annotations
 import logging
 from datetime import timedelta, timezone, datetime
 
+import google.auth
+import google.auth.transport.requests
 from google.cloud import storage
 
 from config import settings
@@ -31,6 +33,9 @@ def upload_pdf(item_id: str, file_bytes: bytes, content_type: str = "application
 
 def generate_signed_url(gcs_path: str, expiration_minutes: int = 15) -> str:
     """Return a short-lived signed URL for secure PDF access."""
+    credentials, _ = google.auth.default()
+    credentials.refresh(google.auth.transport.requests.Request())
+
     client = get_client()
     bucket = client.bucket(settings.gcs_bucket_name)
     blob = bucket.blob(gcs_path)
@@ -38,6 +43,8 @@ def generate_signed_url(gcs_path: str, expiration_minutes: int = 15) -> str:
         expiration=timedelta(minutes=expiration_minutes),
         method="GET",
         version="v4",
+        service_account_email=credentials.service_account_email,
+        access_token=credentials.token,
     )
     return url
 

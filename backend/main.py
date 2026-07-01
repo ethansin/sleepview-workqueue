@@ -8,6 +8,7 @@ from fastapi.responses import JSONResponse
 
 from auth import get_current_user
 from config import settings
+from routers.admin_router import router as admin_router
 from routers.archive_router import router as archive_router
 from routers.auth_router import router as auth_router
 from routers.items_router import router as items_router
@@ -27,6 +28,7 @@ app.add_middleware(
 app.include_router(auth_router)
 app.include_router(items_router)
 app.include_router(archive_router)
+app.include_router(admin_router)
 
 
 @app.get("/auth/me")

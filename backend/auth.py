@@ -17,6 +17,7 @@ import logging
 from datetime import datetime, timedelta, timezone
 from typing import Optional
 
+import bcrypt
 import httpx
 from fastapi import Cookie, HTTPException, Request, status
 from jose import JWTError, jwt
@@ -90,6 +91,31 @@ def get_user_role(email: str) -> Optional[str]:
     if not doc.exists:
         return None
     return doc.to_dict().get("role")
+
+
+def get_user_doc(email: str) -> Optional[dict]:
+    db = get_client()
+    doc = db.collection("users").document(email).get()
+    if not doc.exists:
+        return None
+    return doc.to_dict()
+
+
+def hash_password(plain: str) -> str:
+    return bcrypt.hashpw(plain.encode(), bcrypt.gensalt(rounds=12)).decode()
+
+
+def verify_password(plain: str, hashed: str) -> bool:
+    return bcrypt.checkpw(plain.encode(), hashed.encode())
+
+
+def check_account_lockout(user_doc: dict) -> None:
+    locked_until = user_doc.get("locked_until")
+    if locked_until and locked_until > datetime.now(timezone.utc):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Account temporarily locked due to too many failed login attempts. Try again later.",
+        )
 
 
 def create_session_token(email: str, role: str, name: str) -> str:

@@ -17,6 +17,7 @@ const NAV: Record<string, { label: string; path: string; roles: string[] }[]> =
       { label: "Upload Queue", path: "/upload-queue", roles: ["admin"] },
       { label: "Follow-up Queue", path: "/followup-queue", roles: ["admin"] },
       { label: "Record", path: "/record", roles: ["admin"] },
+      { label: "Pending Users", path: "/admin/users", roles: ["admin"] },
     ],
   };
 
