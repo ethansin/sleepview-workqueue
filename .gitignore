@@ -223,9 +223,21 @@ frontend/build/
 frontend/.env
 frontend/.env.local
 
+# Firebase Hosting deploy artifacts (firebase.json / .firebaserc are tracked)
+.firebase/
+firebase-debug.log
+firestore-debug.log
+ui-debug.log
+pubsub-debug.log
+database-debug.log
+.runtimeconfig.json
+
 # GCP credentials — never commit
 *-credentials.json
 service-account*.json
+
+# gcloud local staging (created by `gcloud run deploy --source`)
+.gcloud/
 
 # macOS
 .DS_Store
