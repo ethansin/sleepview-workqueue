@@ -241,3 +241,6 @@ service-account*.json
 
 # macOS
 .DS_Store
+
+# local deploy guide
+local-deploy.md
