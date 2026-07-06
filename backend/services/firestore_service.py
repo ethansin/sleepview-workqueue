@@ -114,6 +114,52 @@ def list_archived() -> list[WorkflowItem]:
     return list_items_by_status(ItemStatus.archived)
 
 
+def study_id_exists(study_id: str) -> bool:
+    db = get_client()
+    docs = (
+        db.collection(ITEMS_COLLECTION)
+        .where("study_id", "==", study_id)
+        .limit(1)
+        .stream()
+    )
+    return len(list(docs)) > 0
+
+
+APP_SETTINGS_COLLECTION = "app_settings"
+GMAIL_SETTINGS_DOC = "gmail_integration"
+
+_GMAIL_SETTINGS_DEFAULTS = {
+    "connected": False,
+    "connected_email": None,
+    "connected_by": None,
+    "connected_at": None,
+    "refresh_token": None,
+    "check_interval_minutes": 30,
+    "lookback_days": 7,
+    "last_checked_at": None,
+    "last_run_status": None,
+    "last_run_summary": None,
+    "last_run_error": None,
+}
+
+
+def get_gmail_settings() -> dict:
+    db = get_client()
+    doc = db.collection(APP_SETTINGS_COLLECTION).document(GMAIL_SETTINGS_DOC).get()
+    if not doc.exists:
+        return dict(_GMAIL_SETTINGS_DEFAULTS)
+    data = dict(_GMAIL_SETTINGS_DEFAULTS)
+    data.update(doc.to_dict())
+    return data
+
+
+def update_gmail_settings(**fields) -> None:
+    db = get_client()
+    db.collection(APP_SETTINGS_COLLECTION).document(GMAIL_SETTINGS_DOC).set(
+        fields, merge=True
+    )
+
+
 PENDING_USERS_COLLECTION = "pending_users"
 FAILED_LOGIN_LIMIT = 10
 LOCKOUT_MINUTES = 15

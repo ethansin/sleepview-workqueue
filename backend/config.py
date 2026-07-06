@@ -16,6 +16,8 @@ class Settings(BaseSettings):
     cookie_secure: bool = False
     # PDF retention days before archival deletion (HIPAA: 6 years minimum)
     retention_days: int = 2190  # 6 years
+    # Shared secret Cloud Scheduler sends as X-Poll-Secret to trigger Gmail polling
+    gmail_poll_secret: str
 
     class Config:
         env_file = ".env"

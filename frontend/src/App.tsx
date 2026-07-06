@@ -2,6 +2,7 @@ import React from "react";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { AuthProvider, useAuth } from "./AuthContext";
 import { Layout } from "./components/Layout";
+import { AdminGmailSettingsPage } from "./pages/AdminGmailSettingsPage";
 import { AdminUsersPage } from "./pages/AdminUsersPage";
 import { FollowupQueuePage } from "./pages/FollowupQueuePage";
 import { LoginPage } from "./pages/LoginPage";
@@ -35,6 +36,7 @@ const ProtectedRoutes: React.FC = () => {
         <Route path="/followup-queue" element={<FollowupQueuePage />} />
         <Route path="/record" element={<RecordPage />} />
         <Route path="/admin/users" element={<AdminUsersPage />} />
+        <Route path="/admin/gmail" element={<AdminGmailSettingsPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Layout>

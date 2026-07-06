@@ -71,3 +71,32 @@ export const reactivateItem = (id: string, reason: string) =>
 
 export const createItem = (study_id: string) =>
   api.post<WorkflowItem>("/items", { study_id }).then((r) => r.data);
+
+export interface GmailStatus {
+  connected: boolean;
+  connected_email: string | null;
+  connected_at: string | null;
+  check_interval_minutes: number;
+  lookback_days: number;
+  last_checked_at: string | null;
+  last_run_status: string | null;
+  last_run_summary: string | null;
+  last_run_error: string | null;
+}
+
+export const getGmailStatus = () =>
+  api.get<GmailStatus>("/admin/gmail/status").then((r) => r.data);
+
+export const disconnectGmail = () => api.post("/admin/gmail/disconnect");
+
+export const updateGmailSettings = (check_interval_minutes: number, lookback_days: number) =>
+  api
+    .put<GmailStatus>("/admin/gmail/settings", { check_interval_minutes, lookback_days })
+    .then((r) => r.data);
+
+export const checkGmailNow = () =>
+  api
+    .post<{ status: string; created?: number; skipped?: number }>("/admin/gmail/check-now")
+    .then((r) => r.data);
+
+export const gmailConnectUrl = () => `${BASE}/admin/gmail/connect`;
