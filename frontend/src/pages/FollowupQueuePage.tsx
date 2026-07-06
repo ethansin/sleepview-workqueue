@@ -98,11 +98,13 @@ export const FollowupQueuePage: React.FC = () => {
             >
               <div>
                 <div style={{ fontWeight: 600, color: "#1e293b", fontSize: 16 }}>
-                  Study ID: {item.study_id}
+                  {item.role1_data
+                    ? `${item.role1_data.patient_last_name}, ${item.role1_data.patient_first_name}`
+                    : "Unknown Patient"}
                 </div>
                 {item.role1_data && (
                   <div style={{ fontSize: 13, color: "#475569", marginTop: 4 }}>
-                    {item.role1_data.patient_last_name}, {item.role1_data.patient_first_name}
+                    Study ID: {item.study_id}
                     {" · "}DOB: {item.role1_data.date_of_birth}
                     {" · "}MRN: {item.role1_data.mrn}
                   </div>
