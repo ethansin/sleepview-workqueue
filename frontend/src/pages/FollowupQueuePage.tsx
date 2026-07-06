@@ -3,9 +3,12 @@ import dayjs from "dayjs";
 import { confirmFollowup, getFollowupQueue, getPdfUrl, WorkflowItem } from "../api";
 import { StatusBadge } from "../components/Badge";
 
+const CLOSE_ANIMATION_MS = 500;
+
 export const FollowupQueuePage: React.FC = () => {
   const [items, setItems] = useState<WorkflowItem[]>([]);
   const [selected, setSelected] = useState<WorkflowItem | null>(null);
+  const [closingId, setClosingId] = useState<string | null>(null);
   const [note, setNote] = useState("");
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -22,8 +25,22 @@ export const FollowupQueuePage: React.FC = () => {
 
   useEffect(() => { load(); }, []);
 
+  const closePanel = () => {
+    if (!selected) return;
+    setClosingId(selected.id);
+    setTimeout(() => {
+      setSelected(null);
+      setClosingId(null);
+    }, CLOSE_ANIMATION_MS);
+  };
+
   const handleSelect = (item: WorkflowItem) => {
+    if (selected?.id === item.id) {
+      closePanel();
+      return;
+    }
     setSelected(item);
+    setClosingId(null);
     setNote("");
     setError("");
   };
@@ -120,7 +137,7 @@ export const FollowupQueuePage: React.FC = () => {
 
               {selected?.id === item.id && selected.role1_data && (
                 <div
-                  className="inline-form-panel"
+                  className={`inline-form-panel${closingId === item.id ? " closing" : ""}`}
                   style={{
                     background: "#fff",
                     border: "1px solid #e2e8f0",
@@ -236,7 +253,7 @@ export const FollowupQueuePage: React.FC = () => {
                       </button>
                       <button
                         type="button"
-                        onClick={() => { setSelected(null); setError(""); }}
+                        onClick={() => { closePanel(); setError(""); }}
                         style={{
                           background: "transparent",
                           border: "1px solid #cbd5e1",

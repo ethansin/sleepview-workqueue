@@ -3,9 +3,12 @@ import dayjs from "dayjs";
 import { getUploadQueue, submitUpload, WorkflowItem } from "../api";
 import { StatusBadge } from "../components/Badge";
 
+const CLOSE_ANIMATION_MS = 500;
+
 export const UploadQueuePage: React.FC = () => {
   const [items, setItems] = useState<WorkflowItem[]>([]);
   const [selected, setSelected] = useState<WorkflowItem | null>(null);
+  const [closingId, setClosingId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
@@ -27,6 +30,24 @@ export const UploadQueuePage: React.FC = () => {
   };
 
   useEffect(() => { load(); }, []);
+
+  const closePanel = () => {
+    if (!selected) return;
+    setClosingId(selected.id);
+    setTimeout(() => {
+      setSelected(null);
+      setClosingId(null);
+    }, CLOSE_ANIMATION_MS);
+  };
+
+  const handleItemClick = (item: WorkflowItem) => {
+    if (selected?.id === item.id) {
+      closePanel();
+    } else {
+      setSelected(item);
+      setClosingId(null);
+    }
+  };
 
   const handleCopyStudyId = async () => {
     if (!selected) return;
@@ -85,7 +106,7 @@ export const UploadQueuePage: React.FC = () => {
           {items.map((item) => (
             <React.Fragment key={item.id}>
               <div
-                onClick={() => setSelected(item)}
+                onClick={() => handleItemClick(item)}
                 style={{
                   background: "#fff",
                   border: selected?.id === item.id ? "2px solid #1e3a5f" : "1px solid #e2e8f0",
@@ -111,7 +132,7 @@ export const UploadQueuePage: React.FC = () => {
 
               {selected?.id === item.id && (
                 <div
-                  className="inline-form-panel"
+                  className={`inline-form-panel${closingId === item.id ? " closing" : ""}`}
                   style={{
                     background: "#fff",
                     border: "1px solid #e2e8f0",
@@ -186,7 +207,7 @@ export const UploadQueuePage: React.FC = () => {
                       </button>
                       <button
                         type="button"
-                        onClick={() => { setSelected(null); setError(""); setCopied(false); }}
+                        onClick={() => { closePanel(); setError(""); setCopied(false); }}
                         style={{
                           background: "transparent",
                           border: "1px solid #cbd5e1",

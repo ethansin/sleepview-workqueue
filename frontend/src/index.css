@@ -30,6 +30,22 @@ input, textarea, select {
   }
 }
 
+@keyframes slideUpFadeOut {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-36px);
+  }
+}
+
 .inline-form-panel {
   animation: slideDownFadeIn 0.5s ease-out;
+}
+
+.inline-form-panel.closing {
+  animation: slideUpFadeOut 0.5s ease-out forwards;
+  pointer-events: none;
 }
