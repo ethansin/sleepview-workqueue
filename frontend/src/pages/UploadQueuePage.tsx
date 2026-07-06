@@ -9,6 +9,7 @@ export const UploadQueuePage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
+  const [copied, setCopied] = useState(false);
 
   const lastNameRef = useRef<HTMLInputElement>(null);
   const firstNameRef = useRef<HTMLInputElement>(null);
@@ -26,6 +27,13 @@ export const UploadQueuePage: React.FC = () => {
   };
 
   useEffect(() => { load(); }, []);
+
+  const handleCopyStudyId = async () => {
+    if (!selected) return;
+    await navigator.clipboard.writeText(selected.study_id);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1500);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -116,9 +124,27 @@ export const UploadQueuePage: React.FC = () => {
             boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
           }}
         >
-          <h3 style={{ color: "#1e3a5f", marginBottom: 4 }}>
-            Complete Upload — Study {selected.study_id}
-          </h3>
+          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 4 }}>
+            <h3 style={{ color: "#1e3a5f", margin: 0 }}>
+              Complete Upload — Study {selected.study_id}
+            </h3>
+            <button
+              type="button"
+              onClick={handleCopyStudyId}
+              title="Copy Study ID"
+              style={{
+                background: "transparent",
+                border: "1px solid #cbd5e1",
+                borderRadius: 6,
+                padding: "2px 10px",
+                cursor: "pointer",
+                color: "#475569",
+                fontSize: 12,
+              }}
+            >
+              {copied ? "Copied!" : "Copy ID"}
+            </button>
+          </div>
           <p style={{ color: "#64748b", fontSize: 14, marginBottom: 24 }}>
             Fill in all fields and attach the signed PDF report.
           </p>
@@ -164,7 +190,7 @@ export const UploadQueuePage: React.FC = () => {
               </button>
               <button
                 type="button"
-                onClick={() => { setSelected(null); setError(""); }}
+                onClick={() => { setSelected(null); setError(""); setCopied(false); }}
                 style={{
                   background: "transparent",
                   border: "1px solid #cbd5e1",
