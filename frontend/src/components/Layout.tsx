@@ -50,7 +50,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({
         }}
       >
         <span style={{ fontWeight: 700, fontSize: 18, letterSpacing: 0.5 }}>
-          SleepView Workqueue
+          Westlake Workqueue
         </span>
         <nav style={{ display: "flex", gap: 24, alignItems: "center" }}>
           {navItems.map((n) => (
