@@ -83,128 +83,128 @@ export const UploadQueuePage: React.FC = () => {
       ) : (
         <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
           {items.map((item) => (
-            <div
-              key={item.id}
-              onClick={() => setSelected(item)}
-              style={{
-                background: "#fff",
-                border: selected?.id === item.id ? "2px solid #1e3a5f" : "1px solid #e2e8f0",
-                borderRadius: 10,
-                padding: "16px 20px",
-                cursor: "pointer",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                boxShadow: "0 1px 3px rgba(0,0,0,0.04)",
-              }}
-            >
-              <div>
-                <div style={{ fontWeight: 600, color: "#1e293b", fontSize: 16 }}>
-                  Study ID: {item.study_id}
-                </div>
-                <div style={{ fontSize: 12, color: "#94a3b8", marginTop: 4 }}>
-                  Received {dayjs(item.created_at).format("MMM D, YYYY h:mm A")}
-                </div>
-              </div>
-              <StatusBadge status={item.status} />
-            </div>
-          ))}
-        </div>
-      )}
-
-      {/* Upload form panel */}
-      {selected && (
-        <div
-          style={{
-            marginTop: 32,
-            background: "#fff",
-            border: "1px solid #e2e8f0",
-            borderRadius: 12,
-            padding: "28px 32px",
-            boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
-          }}
-        >
-          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 4 }}>
-            <h3 style={{ color: "#1e3a5f", margin: 0 }}>
-              Complete Upload — Study {selected.study_id}
-            </h3>
-            <button
-              type="button"
-              onClick={handleCopyStudyId}
-              title="Copy Study ID"
-              style={{
-                background: "transparent",
-                border: "1px solid #cbd5e1",
-                borderRadius: 6,
-                padding: "2px 10px",
-                cursor: "pointer",
-                color: "#475569",
-                fontSize: 12,
-              }}
-            >
-              {copied ? "Copied!" : "Copy ID"}
-            </button>
-          </div>
-          <p style={{ color: "#64748b", fontSize: 14, marginBottom: 24 }}>
-            Fill in all fields and attach the signed PDF report.
-          </p>
-          <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
-              <Field label="Last Name" required>
-                <input ref={lastNameRef} required style={inputStyle} />
-              </Field>
-              <Field label="First Name" required>
-                <input ref={firstNameRef} required style={inputStyle} />
-              </Field>
-              <Field label="Date of Birth" required>
-                <input ref={dobRef} type="date" required style={inputStyle} />
-              </Field>
-              <Field label="MRN" required>
-                <input ref={mrnRef} required style={inputStyle} />
-              </Field>
-            </div>
-            <Field label="Comments">
-              <textarea ref={commentsRef} rows={3} style={{ ...inputStyle, resize: "vertical" }} />
-            </Field>
-            <Field label="PDF Report" required>
-              <input ref={pdfRef} type="file" accept="application/pdf" required style={inputStyle} />
-            </Field>
-
-            <div style={{ display: "flex", gap: 12, marginTop: 8 }}>
-              <button
-                type="submit"
-                disabled={submitting}
+            <React.Fragment key={item.id}>
+              <div
+                onClick={() => setSelected(item)}
                 style={{
-                  background: "#1e3a5f",
-                  color: "#fff",
-                  border: "none",
-                  borderRadius: 8,
-                  padding: "10px 28px",
-                  fontWeight: 600,
-                  fontSize: 14,
-                  cursor: submitting ? "not-allowed" : "pointer",
-                  opacity: submitting ? 0.7 : 1,
-                }}
-              >
-                {submitting ? "Submitting…" : "Submit & Send to Follow-up Queue"}
-              </button>
-              <button
-                type="button"
-                onClick={() => { setSelected(null); setError(""); setCopied(false); }}
-                style={{
-                  background: "transparent",
-                  border: "1px solid #cbd5e1",
-                  borderRadius: 8,
-                  padding: "10px 20px",
+                  background: "#fff",
+                  border: selected?.id === item.id ? "2px solid #1e3a5f" : "1px solid #e2e8f0",
+                  borderRadius: 10,
+                  padding: "16px 20px",
                   cursor: "pointer",
-                  color: "#475569",
-                  fontSize: 14,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  boxShadow: "0 1px 3px rgba(0,0,0,0.04)",
                 }}
               >
-                Cancel
-              </button>
-            </div>
-          </form>
+                <div>
+                  <div style={{ fontWeight: 600, color: "#1e293b", fontSize: 16 }}>
+                    Study ID: {item.study_id}
+                  </div>
+                  <div style={{ fontSize: 12, color: "#94a3b8", marginTop: 4 }}>
+                    Received {dayjs(item.created_at).format("MMM D, YYYY h:mm A")}
+                  </div>
+                </div>
+                <StatusBadge status={item.status} />
+              </div>
+
+              {selected?.id === item.id && (
+                <div
+                  className="inline-form-panel"
+                  style={{
+                    background: "#fff",
+                    border: "1px solid #e2e8f0",
+                    borderRadius: 12,
+                    padding: "28px 32px",
+                    boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
+                  }}
+                >
+                  <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 4 }}>
+                    <h3 style={{ color: "#1e3a5f", margin: 0 }}>
+                      Complete Upload — Study {selected.study_id}
+                    </h3>
+                    <button
+                      type="button"
+                      onClick={handleCopyStudyId}
+                      title="Copy Study ID"
+                      style={{
+                        background: "transparent",
+                        border: "1px solid #cbd5e1",
+                        borderRadius: 6,
+                        padding: "2px 10px",
+                        cursor: "pointer",
+                        color: "#475569",
+                        fontSize: 12,
+                      }}
+                    >
+                      {copied ? "Copied!" : "Copy ID"}
+                    </button>
+                  </div>
+                  <p style={{ color: "#64748b", fontSize: 14, marginBottom: 24 }}>
+                    Fill in all fields and attach the signed PDF report.
+                  </p>
+                  <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+                      <Field label="Last Name" required>
+                        <input ref={lastNameRef} required style={inputStyle} />
+                      </Field>
+                      <Field label="First Name" required>
+                        <input ref={firstNameRef} required style={inputStyle} />
+                      </Field>
+                      <Field label="Date of Birth" required>
+                        <input ref={dobRef} type="date" required style={inputStyle} />
+                      </Field>
+                      <Field label="MRN" required>
+                        <input ref={mrnRef} required style={inputStyle} />
+                      </Field>
+                    </div>
+                    <Field label="Comments">
+                      <textarea ref={commentsRef} rows={3} style={{ ...inputStyle, resize: "vertical" }} />
+                    </Field>
+                    <Field label="PDF Report" required>
+                      <input ref={pdfRef} type="file" accept="application/pdf" required style={inputStyle} />
+                    </Field>
+
+                    <div style={{ display: "flex", gap: 12, marginTop: 8 }}>
+                      <button
+                        type="submit"
+                        disabled={submitting}
+                        style={{
+                          background: "#1e3a5f",
+                          color: "#fff",
+                          border: "none",
+                          borderRadius: 8,
+                          padding: "10px 28px",
+                          fontWeight: 600,
+                          fontSize: 14,
+                          cursor: submitting ? "not-allowed" : "pointer",
+                          opacity: submitting ? 0.7 : 1,
+                        }}
+                      >
+                        {submitting ? "Submitting…" : "Submit & Send to Follow-up Queue"}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => { setSelected(null); setError(""); setCopied(false); }}
+                        style={{
+                          background: "transparent",
+                          border: "1px solid #cbd5e1",
+                          borderRadius: 8,
+                          padding: "10px 20px",
+                          cursor: "pointer",
+                          color: "#475569",
+                          fontSize: 14,
+                        }}
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              )}
+            </React.Fragment>
+          ))}
         </div>
       )}
     </div>

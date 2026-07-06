@@ -18,3 +18,18 @@ button {
 input, textarea, select {
   font-family: inherit;
 }
+
+@keyframes slideDownFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-36px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.inline-form-panel {
+  animation: slideDownFadeIn 0.5s ease-out;
+}
