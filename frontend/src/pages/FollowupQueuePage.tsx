@@ -196,14 +196,14 @@ export const FollowupQueuePage: React.FC = () => {
               Follow-up Note <span style={{ color: "#dc2626" }}>*</span>
             </label>
             <p style={{ fontSize: 13, color: "#64748b", marginBottom: 8 }}>
-              Briefly describe what follow-up action was taken (e.g., "Sent prescription to ABC DME", "Report faxed to Dr. Smith").
+              Briefly describe what follow-up action was taken.
             </p>
             <textarea
               value={note}
               onChange={(e) => setNote(e.target.value)}
               rows={4}
               required
-              placeholder="e.g., Sent CPAP prescription to Lincare. Faxed report to Dr. Johnson at 555-0100."
+              placeholder="e.g., Sent CPAP prescription to Sincere. Faxed report to Dr. Johnson at 555-0100."
               style={{
                 width: "100%",
                 padding: "8px 10px",
