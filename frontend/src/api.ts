@@ -17,6 +17,8 @@ export interface WorkflowItem {
     patient_first_name: string;
     date_of_birth: string;
     mrn: string;
+    medicare: boolean;
+    clinical_note_expiration?: string;
     comments?: string;
     pdf_gcs_path?: string;
     completed_at?: string;

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import dayjs from "dayjs";
 import { confirmFollowup, getFollowupQueue, getPdfUrl, WorkflowItem } from "../api";
-import { StatusBadge } from "../components/Badge";
+import { MedicareBadge, StatusBadge } from "../components/Badge";
 
 const CLOSE_ANIMATION_MS = 500;
 
@@ -124,6 +124,9 @@ export const FollowupQueuePage: React.FC = () => {
                       Study ID: {item.study_id}
                       {" · "}DOB: {item.role1_data.date_of_birth}
                       {" · "}MRN: {item.role1_data.mrn}
+                      {item.role1_data.medicare && (
+                        <>{" · "}Clinical Note Exp: {item.role1_data.clinical_note_expiration}</>
+                      )}
                     </div>
                   )}
                   <div style={{ fontSize: 12, color: "#94a3b8", marginTop: 4 }}>
@@ -132,7 +135,10 @@ export const FollowupQueuePage: React.FC = () => {
                       : "—"}
                   </div>
                 </div>
-                <StatusBadge status={item.status} />
+                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                  {item.role1_data?.medicare && <MedicareBadge />}
+                  <StatusBadge status={item.status} />
+                </div>
               </div>
 
               {selected?.id === item.id && selected.role1_data && (

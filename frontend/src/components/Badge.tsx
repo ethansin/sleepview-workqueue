@@ -30,3 +30,20 @@ export const StatusBadge: React.FC<{ status: string }> = ({ status }) => (
     {labels[status] ?? status}
   </span>
 );
+
+export const MedicareBadge: React.FC = () => (
+  <span
+    style={{
+      display: "inline-block",
+      padding: "2px 10px",
+      borderRadius: 12,
+      fontSize: 12,
+      fontWeight: 600,
+      color: "#fff",
+      background: "#7c3aed",
+      letterSpacing: 0.3,
+    }}
+  >
+    Medicare
+  </span>
+);

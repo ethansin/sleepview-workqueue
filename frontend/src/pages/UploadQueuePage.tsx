@@ -13,11 +13,13 @@ export const UploadQueuePage: React.FC = () => {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [copied, setCopied] = useState(false);
+  const [medicare, setMedicare] = useState(false);
 
   const lastNameRef = useRef<HTMLInputElement>(null);
   const firstNameRef = useRef<HTMLInputElement>(null);
   const dobRef = useRef<HTMLInputElement>(null);
   const mrnRef = useRef<HTMLInputElement>(null);
+  const clinicalNoteExpirationRef = useRef<HTMLInputElement>(null);
   const commentsRef = useRef<HTMLTextAreaElement>(null);
   const pdfRef = useRef<HTMLInputElement>(null);
 
@@ -46,6 +48,7 @@ export const UploadQueuePage: React.FC = () => {
     } else {
       setSelected(item);
       setClosingId(null);
+      setMedicare(false);
     }
   };
 
@@ -59,12 +62,18 @@ export const UploadQueuePage: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selected || !pdfRef.current?.files?.[0]) return;
+    if (medicare && !clinicalNoteExpirationRef.current?.value.trim()) {
+      setError("Clinical note expiration is required when Medicare is checked.");
+      return;
+    }
     const file = pdfRef.current.files[0];
     const form = new FormData();
     form.append("patient_last_name", lastNameRef.current!.value.trim());
     form.append("patient_first_name", firstNameRef.current!.value.trim());
-    form.append("date_of_birth", dobRef.current!.value);
+    form.append("date_of_birth", dobRef.current!.value.trim());
     form.append("mrn", mrnRef.current!.value.trim());
+    form.append("medicare", medicare ? "true" : "false");
+    form.append("clinical_note_expiration", medicare ? clinicalNoteExpirationRef.current!.value.trim() : "");
     form.append("comments", commentsRef.current!.value.trim());
     form.append("pdf", file);
 
@@ -174,12 +183,45 @@ export const UploadQueuePage: React.FC = () => {
                         <input ref={firstNameRef} required style={inputStyle} />
                       </Field>
                       <Field label="Date of Birth" required>
-                        <input ref={dobRef} type="date" required style={inputStyle} />
+                        <input
+                          ref={dobRef}
+                          type="text"
+                          inputMode="numeric"
+                          placeholder="MM/DD/YYYY"
+                          pattern="\d{2}/\d{2}/\d{4}"
+                          title="MM/DD/YYYY"
+                          required
+                          style={inputStyle}
+                        />
                       </Field>
                       <Field label="MRN" required>
                         <input ref={mrnRef} required style={inputStyle} />
                       </Field>
                     </div>
+                    <Field label="Medicare">
+                      <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 14, color: "#334155" }}>
+                        <input
+                          type="checkbox"
+                          checked={medicare}
+                          onChange={(e) => setMedicare(e.target.checked)}
+                        />
+                        Patient has Medicare
+                      </label>
+                    </Field>
+                    {medicare && (
+                      <Field label="Clinical Note Expiration" required>
+                        <input
+                          ref={clinicalNoteExpirationRef}
+                          type="text"
+                          inputMode="numeric"
+                          placeholder="MM/DD/YYYY"
+                          pattern="\d{2}/\d{2}/\d{4}"
+                          title="MM/DD/YYYY"
+                          required
+                          style={inputStyle}
+                        />
+                      </Field>
+                    )}
                     <Field label="Comments">
                       <textarea ref={commentsRef} rows={3} style={{ ...inputStyle, resize: "vertical" }} />
                     </Field>

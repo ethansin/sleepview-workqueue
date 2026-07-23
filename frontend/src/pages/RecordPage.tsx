@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import dayjs from "dayjs";
 import { getArchived, getCompleted, getPdfUrl, reactivateItem, WorkflowItem } from "../api";
-import { StatusBadge } from "../components/Badge";
+import { MedicareBadge, StatusBadge } from "../components/Badge";
 import { useAuth } from "../AuthContext";
 
 type Tab = "completed" | "archived";
@@ -118,12 +118,18 @@ export const RecordPage: React.FC = () => {
                     </span>
                   )}
                 </div>
-                <StatusBadge status={item.status} />
+                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                  {item.role1_data?.medicare && <MedicareBadge />}
+                  <StatusBadge status={item.status} />
+                </div>
               </div>
               <div style={{ fontSize: 12, color: "#94a3b8", marginTop: 4 }}>
                 Completed {item.role2_data?.confirmed_at
                   ? dayjs(item.role2_data.confirmed_at).format("MMM D, YYYY h:mm A")
                   : "—"}
+                {item.role1_data?.medicare && (
+                  <>{" · "}Clinical Note Exp: {item.role1_data.clinical_note_expiration}</>
+                )}
               </div>
 
               {/* Expanded detail */}

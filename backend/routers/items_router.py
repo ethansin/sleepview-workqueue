@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import re
 from datetime import datetime, timezone
 
 from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile, status
@@ -20,6 +21,8 @@ from services import firestore_service as db
 from services import storage_service as storage
 
 router = APIRouter(prefix="/items", tags=["items"])
+
+DATE_FORMAT_PATTERN = re.compile(r"^\d{2}/\d{2}/\d{4}$")  # MM/DD/YYYY
 
 ALLOWED_ROLES_UPLOAD = {"uploader", "admin"}
 ALLOWED_ROLES_REVIEW = {"reviewer", "admin"}
@@ -72,6 +75,8 @@ async def submit_upload(
     patient_first_name: str = Form(...),
     date_of_birth: str = Form(...),
     mrn: str = Form(...),
+    medicare: bool = Form(default=False),
+    clinical_note_expiration: str = Form(default=""),
     comments: str = Form(default=""),
     pdf: UploadFile = File(...),
     user: dict = Depends(get_current_user),
@@ -88,6 +93,21 @@ async def submit_upload(
     if pdf.content_type not in ("application/pdf",):
         raise HTTPException(status_code=400, detail="Only PDF files are accepted.")
 
+    if not DATE_FORMAT_PATTERN.match(date_of_birth.strip()):
+        raise HTTPException(status_code=400, detail="Date of birth must be in MM/DD/YYYY format.")
+
+    if medicare:
+        if not clinical_note_expiration.strip():
+            raise HTTPException(
+                status_code=400,
+                detail="Clinical note expiration is required when Medicare is checked.",
+            )
+        if not DATE_FORMAT_PATTERN.match(clinical_note_expiration.strip()):
+            raise HTTPException(
+                status_code=400,
+                detail="Clinical note expiration must be in MM/DD/YYYY format.",
+            )
+
     pdf_bytes = await pdf.read()
     gcs_path = storage.upload_pdf(item_id, pdf_bytes)
 
@@ -96,6 +116,8 @@ async def submit_upload(
         patient_first_name=patient_first_name,
         date_of_birth=date_of_birth,
         mrn=mrn,
+        medicare=medicare,
+        clinical_note_expiration=(clinical_note_expiration.strip() or None) if medicare else None,
         comments=comments or None,
         pdf_gcs_path=gcs_path,
         completed_at=datetime.now(timezone.utc),

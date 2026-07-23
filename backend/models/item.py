@@ -21,8 +21,10 @@ class ItemStatus(str, Enum):
 class Role1Data(BaseModel):
     patient_last_name: str
     patient_first_name: str
-    date_of_birth: str  # ISO date string, e.g. "1980-01-15"
+    date_of_birth: str  # MM/DD/YYYY, e.g. "01/15/1980"
     mrn: str
+    medicare: bool = False
+    clinical_note_expiration: Optional[str] = None  # MM/DD/YYYY; required if medicare
     comments: Optional[str] = None
     pdf_gcs_path: Optional[str] = None
     completed_at: Optional[datetime] = None
@@ -59,6 +61,8 @@ class SubmitRole1Request(BaseModel):
     patient_first_name: str
     date_of_birth: str
     mrn: str
+    medicare: bool = False
+    clinical_note_expiration: Optional[str] = None
     comments: Optional[str] = None
 
 
